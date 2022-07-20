@@ -3,9 +3,8 @@ import Hammer from "hammerjs";
 import { nextTick, onMounted } from "vue";
 
 function hammerIt(elm) {
-  console.log(Hammer);
-  const hammertime = new Hammer(elm, {});
-  hammertime.get("pinch").set({
+  const instance = new Hammer(elm, {});
+  instance.get("pinch").set({
     enable: true,
   });
   var posX = 0,
@@ -19,7 +18,7 @@ function hammerIt(elm) {
     transform = "",
     el = elm;
 
-  hammertime.on("doubletap pan pinch panend pinchend", function (ev) {
+  instance.on("doubletap pan pinch panend pinchend", function (ev) {
     if (ev.type === "doubletap") {
       transform = "translate3d(0, 0, 0) " + "scale3d(2, 2, 1) ";
       scale = 2;
@@ -91,11 +90,19 @@ function hammerIt(elm) {
     }
 
     if (transform) {
+      console.log("transform: ", transform);
       el.style.webkitTransform = transform;
     }
   });
 }
 
+function onButtonClick(e) {
+  // const el = e.target;
+  console.log("e: ", e);
+  const el = document.getElementById("elem");
+  const transform = `translate3d(${e.x}px, ${e.y}px, 0) scale3d(2, 2, 1)`;
+  el.style.transform = transform;
+}
 onMounted(async () => {
   await nextTick();
   hammerIt(document.getElementById("elem"));
@@ -104,7 +111,10 @@ onMounted(async () => {
 
 <template>
   <div id="elem" class="w-[300px] h-[300px] bg-green-300 rounded p-5">
-    <button class="bg-green-600 rounded active:bg-green-800 p-1 text-white">
+    <button
+      @click="onButtonClick"
+      class="bg-green-600 rounded active:bg-green-800 p-1 text-white"
+    >
       Click
     </button>
   </div>
