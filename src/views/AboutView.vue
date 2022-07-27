@@ -38,6 +38,11 @@ function onSeatClick(event, i) {
 }
 
 const zoomOptions = {
+  maxZoom: 1,
+  minZoom: 0.1,
+  initialX: 300,
+  initialY: 500,
+  initialZoom: 0.5,
   onTouch: function (e) {
     // `e` - is current touch event.
     console.log("on touch: ", e);
