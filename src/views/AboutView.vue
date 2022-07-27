@@ -43,6 +43,8 @@ const zoomOptions = {
   initialX: 300,
   initialY: 500,
   initialZoom: 0.5,
+  zoomDoubleClickSpeed: 1, // disable double click zoom
+
   onTouch: function (e) {
     // `e` - is current touch event.
     console.log("on touch: ", e);
