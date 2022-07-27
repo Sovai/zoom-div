@@ -40,16 +40,11 @@ function onSeatClick(event, i) {
 const zoomOptions = {
   maxZoom: 1,
   minZoom: 0.1,
-  initialX: 300,
-  initialY: 500,
+  // initialX: 0,
+  // initialY: 0,
   initialZoom: 0.5,
   zoomDoubleClickSpeed: 1, // disable double click zoom
 
-  onTouch: function (e) {
-    // `e` - is current touch event.
-    console.log("on touch: ", e);
-    return false; // tells the library to not preventDefault.
-  },
   beforeWheel: () =>
     function (e) {
       // allow wheel-zoom only if altKey is down. Otherwise - ignore
