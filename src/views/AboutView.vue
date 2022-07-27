@@ -38,6 +38,11 @@ function onSeatClick(event, i) {
 }
 
 const zoomOptions = {
+  onTouch: function (e) {
+    // `e` - is current touch event.
+    console.log("on touch: ", e);
+    return false; // tells the library to not preventDefault.
+  },
   beforeWheel: () =>
     function (e) {
       // allow wheel-zoom only if altKey is down. Otherwise - ignore
