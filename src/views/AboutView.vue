@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import panzoom from "panzoom";
 const layoutRef = ref(null);
 const instance = ref(null);
@@ -30,21 +30,35 @@ let isPanning = ref(false);
 function onSeatClick(event, i) {
   if (isPanning.value) return;
   selected.value = i;
-  instance.value.smoothZoom(event.clientX, event.clientY, 3);
+
+  console.log("test: ", getZoomState());
+  if (getZoomState() <= 1) {
+    instance.value.smoothZoom(event.clientX, event.clientY, 2);
+  }
 }
 
 const zoomOptions = {
-  // now all zoom operations will happen based on the center of the screen
-  transformOrigin: { x: 0.5, y: 0.5 },
-  // beforeWheel: function (e) {
-  //   // allow wheel-zoom only if altKey is down. Otherwise - ignore
-  //   var shouldIgnore = !e.altKey;
-  //   return shouldIgnore;
-  // },
+  beforeWheel: () =>
+    function (e) {
+      // allow wheel-zoom only if altKey is down. Otherwise - ignore
+      var shouldIgnore = !e.altKey;
+      return shouldIgnore;
+    },
+  beforeMouseDown: () =>
+    function (e) {
+      // allow wheel-zoom only if altKey is down. Otherwise - ignore
+      var shouldIgnore = !e.altKey;
+      return shouldIgnore;
+    },
 };
 
-onMounted(async () => {
-  await nextTick();
+function getZoomState() {
+  const { scale } = instance.value.getTransform();
+
+  return scale;
+}
+
+async function initZoom() {
   instance.value = panzoom(layoutRef.value, zoomOptions);
   instance.value.on("panstart", function (e) {
     console.log("Fired when pan is just started ", e);
@@ -53,8 +67,6 @@ onMounted(async () => {
 
   instance.value.on("pan", function (e) {
     isPanning.value = true;
-    const { scale } = instance.value.getTransform();
-    if (scale > 1) return;
     console.log("Fired when the `element` is being panned", e);
   });
 
@@ -64,8 +76,6 @@ onMounted(async () => {
     }, 300);
 
     console.log("Fired when pan ended", e);
-
-    console.log("getZoomState: ", instance.value.getTransform());
   });
 
   instance.value.on("zoom", function (e) {
@@ -80,6 +90,9 @@ onMounted(async () => {
     // This event will be called along with events above.
     console.log("Fired when any transformation has happened", e);
   });
+}
+onMounted(async () => {
+  initZoom();
 });
 
 onBeforeUnmount(() => {
