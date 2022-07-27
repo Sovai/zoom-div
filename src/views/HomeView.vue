@@ -110,6 +110,11 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div class="bg-red-500 relative h-20 w-full">
+    <div
+      class="absolute bg-red-500 border-t-black rounded-t-lg top-0 lef-0 w-full h-20"
+    ></div>
+  </div>
   <div id="elem" class="w-[300px] h-[300px] bg-green-300 rounded p-5">
     <button
       @click="onButtonClick"
