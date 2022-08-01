@@ -6,6 +6,7 @@ import { RouterView } from "vue-router";
   <div class="flex gap-4">
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/about">About</RouterLink>
+    <RouterLink to="/gsap">Gsap</RouterLink>
   </div>
   <RouterView />
 </template>

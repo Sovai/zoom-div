@@ -12,14 +12,6 @@ function scalingHandler(scale) {
   console.log(scale);
 }
 
-function onWrapperClick(event) {
-  console.log(event.x);
-  // zoomer.value.setData({
-  //   translateX: -event.x,
-  //   translateY: -event.y,
-  // });
-}
-
 const zoomer = ref(null);
 const within = ref(true);
 const minScale = ref(1);
@@ -34,8 +26,18 @@ const eventData = ref({});
 
 let selected = ref(null);
 function onSeatClick(event, i) {
-  selected.value = i;
+  selected.value = selected.value === i ? null : i;
+
+  console.log({ event });
+  // zoomer.value.setData({
+  //   scale: 2,
+  //   originX: 0,
+  //   originY: 0,
+  //   translateX: event.clientX,
+  //   translateY: event.clientXY,
+  // });
 }
+
 const onEvent = (name, e) => {
   console.log({ name, e });
   eventName.value = name;
@@ -57,6 +59,11 @@ const reset = () => {
     });
   }
 };
+
+let getContainerWidth = 500;
+let getContainerHeight = 500;
+let getContentWidth = 1000;
+let getContentHeight = 1000;
 </script>
 
 <template inheritAttrs="false">
@@ -73,8 +80,6 @@ const reset = () => {
     <PinchScrollZoom
       ref="zoomer"
       v-bind="$attrs"
-      :width="500"
-      :height="500"
       :scale="scale"
       :translate-x="translateX"
       :translate-y="translateY"
@@ -92,8 +97,10 @@ const reset = () => {
       :enableStopDrag="true"
       :enableDragging="true"
       style="border: 1px solid black"
-      :content-width="500"
-      :content-height="500"
+      :width="getContainerWidth"
+      :height="getContainerHeight"
+      :content-width="getContentWidth"
+      :content-height="getContentHeight"
     >
       <div ref="layoutRef" class="flex flex-wrap gap-2">
         <div

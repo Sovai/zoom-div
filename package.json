@@ -10,6 +10,7 @@
   "dependencies": {
     "@coddicat/vue-pinch-scroll-zoom": "^3.3.4",
     "@coddicat/vue3-pinch-scroll-zoom": "^0.2.1",
+    "gsap": "^3.10.4",
     "hammerjs": "^2.0.8",
     "panzoom": "^9.4.3",
     "pinch-zoom-element": "^1.1.1",
