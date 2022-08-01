@@ -1,126 +1,122 @@
+<!-- eslint-disable no-unused-vars -->
 <script setup>
-import Hammer from "hammerjs";
-import { nextTick, onMounted } from "vue";
+import PinchScrollZoom from "@coddicat/vue3-pinch-scroll-zoom";
 
-function hammerIt(elm) {
-  const instance = new Hammer(elm, {});
-  instance.get("pinch").set({
-    enable: true,
-  });
-  var posX = 0,
-    posY = 0,
-    scale = 1,
-    last_scale = 1,
-    last_posX = 0,
-    last_posY = 0,
-    max_pos_x = 0,
-    max_pos_y = 0,
-    transform = "",
-    el = elm;
+import { nextTick, onMounted, ref } from "vue";
 
-  instance.on("doubletap pan pinch panend pinchend", function (ev) {
-    if (ev.type === "doubletap") {
-      transform = "translate3d(0, 0, 0) " + "scale3d(2, 2, 1) ";
-      scale = 2;
-      last_scale = 2;
-      try {
-        if (
-          window
-            .getComputedStyle(el, null)
-            .getPropertyValue("-webkit-transform")
-            .toString() != "matrix(1, 0, 0, 1, 0, 0)"
-        ) {
-          transform = "translate3d(0, 0, 0) " + "scale3d(1, 1, 1) ";
-          scale = 1;
-          last_scale = 1;
-        }
-      } catch (err) {
-        console.log("err: ", err);
-      }
-      el.style.webkitTransform = transform;
-      transform = "";
-    }
-
-    //pan
-    if (scale != 1) {
-      posX = last_posX + ev.deltaX;
-      posY = last_posY + ev.deltaY;
-      max_pos_x = Math.ceil(((scale - 1) * el.clientWidth) / 2);
-      max_pos_y = Math.ceil(((scale - 1) * el.clientHeight) / 2);
-      if (posX > max_pos_x) {
-        posX = max_pos_x;
-      }
-      if (posX < -max_pos_x) {
-        posX = -max_pos_x;
-      }
-      if (posY > max_pos_y) {
-        posY = max_pos_y;
-      }
-      if (posY < -max_pos_y) {
-        posY = -max_pos_y;
-      }
-    }
-
-    //pinch
-    if (ev.type === "pinch") {
-      scale = Math.max(0.999, Math.min(last_scale * ev.scale, 4));
-    }
-    if (ev.type === "pinchend") {
-      last_scale = scale;
-    }
-
-    //panend
-    if (ev.type === "panend") {
-      last_posX = posX < max_pos_x ? posX : max_pos_x;
-      last_posY = posY < max_pos_y ? posY : max_pos_y;
-    }
-
-    if (scale !== 1) {
-      transform =
-        "translate3d(" +
-        posX +
-        "px," +
-        posY +
-        "px, 0) " +
-        "scale3d(" +
-        scale +
-        ", " +
-        scale +
-        ", 1)";
-    }
-
-    if (transform) {
-      console.log("transform: ", transform);
-      el.style.webkitTransform = transform;
-    }
-  });
-}
-
-function onButtonClick(e) {
-  // const el = e.target;
-  console.log("e: ", e);
-  const el = document.getElementById("elem");
-  const transform = `translate3d(${e.x}px, ${e.y}px, 0) scale3d(2, 2, 1)`;
-  el.style.transform = transform;
-}
 onMounted(async () => {
   await nextTick();
-  hammerIt(document.getElementById("elem"));
 });
+
+function scalingHandler(scale) {
+  console.log(scale);
+}
+
+function onWrapperClick(event) {
+  console.log(event.x);
+  // zoomer.value.setData({
+  //   translateX: -event.x,
+  //   translateY: -event.y,
+  // });
+}
+
+const zoomer = ref(null);
+const within = ref(true);
+const minScale = ref(1);
+const maxScale = ref(2);
+const scale = ref(1);
+const originX = ref(0);
+const originY = ref(0);
+const translateX = ref(0);
+const translateY = ref(0);
+const eventName = ref("N/A");
+const eventData = ref({});
+
+const onEvent = (name, e) => {
+  console.log({ name, e });
+  eventName.value = name;
+  eventData.value = e;
+  scale.value = e.scale;
+  originX.value = e.originX;
+  originY.value = e.originY;
+  translateX.value = e.translateX;
+  translateY.value = e.translateY;
+};
+const reset = () => {
+  if (zoomer.value !== null) {
+    zoomer.value.setData({
+      scale: 1,
+      originX: 0,
+      originY: 0,
+      translateX: 0,
+      translateY: 0,
+    });
+  }
+};
 </script>
 
 <template>
-  <div class="bg-red-500 relative h-20 w-full">
+  scale: {{ scale.toFixed(2) }} <br />
+  origin: ({{ originX.toFixed(2) }}, {{ originY.toFixed(2) }}) <br />
+  translate: ({{ translateX.toFixed(2) }}, {{ translateY.toFixed(2) }}) <br />
+
+  <PinchScrollZoom
+    ref="zoomer"
+    v-bind="$attrs"
+    :width="300"
+    :height="400"
+    :scale="scale"
+    :translate-x="translateX"
+    :translate-y="translateY"
+    :origin-x="originX"
+    :origin-y="originY"
+    :within="within"
+    :min-scale="minScale"
+    :max-scale="maxScale"
+    @scaling="(e) => onEvent('scaling', e)"
+    @startDrag="(e) => onEvent('startDrag', e)"
+    @stopDrag="(e) => onEvent('stopDrag', e)"
+    @dragging="(e) => onEvent('dragging', e)"
+    :enableScaling="true"
+    :enableStartDrag="true"
+    :enableStopDrag="true"
+    :enableDragging="true"
+    style="border: 1px solid black"
+    :content-width="500"
+    :content-height="500"
+  >
+    <!-- <img src="https://picsum.photos/600/1000" width="300" height="400" /> -->
+
     <div
-      class="absolute bg-red-500 border-t-black rounded-t-lg top-0 lef-0 w-full h-20"
-    ></div>
-  </div>
-  <div id="elem" class="w-[300px] h-[300px] bg-green-300 rounded p-5">
-    <button
-      @click="onButtonClick"
-      class="bg-green-600 rounded active:bg-green-800 p-1 text-white"
+      id="elem"
+      class="w-[300px] h-[300px] bg-green-300 rounded p-5"
+      @click="onWrapperClick"
     >
-      Click
-    </button>
-  </div>
+      <button
+        @click="reset"
+        class="bg-green-600 rounded active:bg-green-800 p-1 text-white"
+      >
+        Click
+      </button>
+    </div>
+  </PinchScrollZoom>
+
+  <button @click="reset">Reset</button>
+  <label>
+    <input type="checkbox" v-model="within" :value="true" />
+    within
+  </label>
+  <br />
+  <label>
+    min scale:
+    <input type="number" v-model.number="minScale" style="width: 40px" />
+  </label>
+  <label>
+    max scale:
+    <input type="number" v-model.number="maxScale" style="width: 40px" />
+  </label>
+  <p>
+    {{ eventName }}:<br />
+    {{ eventData }}
+  </p>
 </template>

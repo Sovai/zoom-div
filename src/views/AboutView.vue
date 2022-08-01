@@ -6,16 +6,17 @@
       SCREEN
     </div>
     <div
-      ref="layoutRef"
-      class="flex flex-wrap gap-2 border p-10 rounded border-red-600"
+      class="relative w-[500px] h-[500px] overflow-hidden rounded border border-red-600"
     >
-      <div
-        v-for="i in 150"
-        :key="i"
-        @click="onSeatClick($event, i)"
-        class="rounded-md w-10 h-10"
-        :class="i === selected ? 'bg-red-500' : 'bg-blue-400'"
-      ></div>
+      <div ref="layoutRef" class="flex flex-wrap gap-2">
+        <div
+          v-for="i in 150"
+          :key="i"
+          @click="onSeatClick($event, i)"
+          class="rounded-md w-10 h-10"
+          :class="i === selected ? 'bg-red-500' : 'bg-blue-400'"
+        ></div>
+      </div>
     </div>
   </div>
 </template>
@@ -33,30 +34,33 @@ function onSeatClick(event, i) {
 
   console.log("test: ", getZoomState());
   if (getZoomState() <= 1) {
-    instance.value.smoothZoom(event.clientX, event.clientY, 2);
+    instance.value.smoothZoom(event.clientX, event.clientY, 1.5);
   }
 }
+let centerCenter = { x: 0.5, y: 0.5 };
 
 const zoomOptions = {
-  maxZoom: 1,
-  minZoom: 0.1,
+  maxZoom: 1.5,
+  minZoom: 1,
   // initialX: 0,
   // initialY: 0,
-  initialZoom: 0.5,
-  zoomDoubleClickSpeed: 1, // disable double click zoom
+  // transformOrigin: { x: 0.5, y: 0.5 },
+  transformOrigin: centerCenter,
+  initialZoom: 1,
+  // zoomDoubleClickSpeed: 1, // disable double click zoom
 
-  beforeWheel: () =>
-    function (e) {
-      // allow wheel-zoom only if altKey is down. Otherwise - ignore
-      var shouldIgnore = !e.altKey;
-      return shouldIgnore;
-    },
-  beforeMouseDown: () =>
-    function (e) {
-      // allow wheel-zoom only if altKey is down. Otherwise - ignore
-      var shouldIgnore = !e.altKey;
-      return shouldIgnore;
-    },
+  // beforeWheel: () =>
+  //   function (e) {
+  //     // allow wheel-zoom only if altKey is down. Otherwise - ignore
+  //     var shouldIgnore = !e.altKey;
+  //     return shouldIgnore;
+  //   },
+  // beforeMouseDown: () =>
+  //   function (e) {
+  //     // allow wheel-zoom only if altKey is down. Otherwise - ignore
+  //     var shouldIgnore = !e.altKey;
+  //     return shouldIgnore;
+  //   },
 };
 
 function getZoomState() {
