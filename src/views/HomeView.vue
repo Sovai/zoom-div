@@ -32,6 +32,10 @@ const translateY = ref(0);
 const eventName = ref("N/A");
 const eventData = ref({});
 
+let selected = ref(null);
+function onSeatClick(event, i) {
+  selected.value = i;
+}
 const onEvent = (name, e) => {
   console.log({ name, e });
   eventName.value = name;
@@ -55,51 +59,53 @@ const reset = () => {
 };
 </script>
 
-<template>
+<template inheritAttrs="false">
   scale: {{ scale.toFixed(2) }} <br />
   origin: ({{ originX.toFixed(2) }}, {{ originY.toFixed(2) }}) <br />
   translate: ({{ translateX.toFixed(2) }}, {{ translateY.toFixed(2) }}) <br />
 
-  <PinchScrollZoom
-    ref="zoomer"
-    v-bind="$attrs"
-    :width="300"
-    :height="400"
-    :scale="scale"
-    :translate-x="translateX"
-    :translate-y="translateY"
-    :origin-x="originX"
-    :origin-y="originY"
-    :within="within"
-    :min-scale="minScale"
-    :max-scale="maxScale"
-    @scaling="(e) => onEvent('scaling', e)"
-    @startDrag="(e) => onEvent('startDrag', e)"
-    @stopDrag="(e) => onEvent('stopDrag', e)"
-    @dragging="(e) => onEvent('dragging', e)"
-    :enableScaling="true"
-    :enableStartDrag="true"
-    :enableStopDrag="true"
-    :enableDragging="true"
-    style="border: 1px solid black"
-    :content-width="500"
-    :content-height="500"
-  >
-    <!-- <img src="https://picsum.photos/600/1000" width="300" height="400" /> -->
-
+  <div class="p-20 bg-slate-100">
     <div
-      id="elem"
-      class="w-[300px] h-[300px] bg-green-300 rounded p-5"
-      @click="onWrapperClick"
+      class="h-8 w-3/5 bg-blue-700 rounded-md mb-20 mx-auto text-white grid place-content-center"
     >
-      <button
-        @click="reset"
-        class="bg-green-600 rounded active:bg-green-800 p-1 text-white"
-      >
-        Click
-      </button>
+      SCREEN
     </div>
-  </PinchScrollZoom>
+    <PinchScrollZoom
+      ref="zoomer"
+      v-bind="$attrs"
+      :width="500"
+      :height="500"
+      :scale="scale"
+      :translate-x="translateX"
+      :translate-y="translateY"
+      :origin-x="originX"
+      :origin-y="originY"
+      :within="within"
+      :min-scale="minScale"
+      :max-scale="maxScale"
+      @scaling="(e) => onEvent('scaling', e)"
+      @startDrag="(e) => onEvent('startDrag', e)"
+      @stopDrag="(e) => onEvent('stopDrag', e)"
+      @dragging="(e) => onEvent('dragging', e)"
+      :enableScaling="true"
+      :enableStartDrag="true"
+      :enableStopDrag="true"
+      :enableDragging="true"
+      style="border: 1px solid black"
+      :content-width="500"
+      :content-height="500"
+    >
+      <div ref="layoutRef" class="flex flex-wrap gap-2">
+        <div
+          v-for="i in 150"
+          :key="i"
+          @click="onSeatClick($event, i)"
+          class="rounded-md w-10 h-10"
+          :class="i === selected ? 'bg-red-500' : 'bg-blue-400'"
+        ></div>
+      </div>
+    </PinchScrollZoom>
+  </div>
 
   <button @click="reset">Reset</button>
   <label>
